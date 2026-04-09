@@ -1,12 +1,19 @@
-import java.util.*;
-import java.util.stream.Collectors;
+// Custom Exception Class
+class InvalidCapacityException extends Exception {
+    public InvalidCapacityException(String message) {
+        super(message);
+    }
+}
 
-// Passenger Bogie class
+// Passenger Bogie Class
 class PassengerBogie {
     private String type;
     private int capacity;
 
-    public PassengerBogie(String type, int capacity) {
+    public PassengerBogie(String type, int capacity) throws InvalidCapacityException {
+        if (capacity <= 0) {
+            throw new InvalidCapacityException("Capacity must be greater than zero");
+        }
         this.type = type;
         this.capacity = capacity;
     }
@@ -21,35 +28,22 @@ class PassengerBogie {
 
     @Override
     public String toString() {
-        return "PassengerBogie{" +
-                "type='" + type + '\'' +
-                ", capacity=" + capacity +
-                '}';
+        return "PassengerBogie{" + "type='" + type + '\'' + ", capacity=" + capacity + '}';
     }
 }
 
-public class TrainConsistManagementApp {
+// Main Application
+public class TrainConsistManagementApp{
     public static void main(String[] args) {
-        // Original bogie list (reused from UC7)
-        List<PassengerBogie> bogies = Arrays.asList(
-                new PassengerBogie("Sleeper", 50),
-                new PassengerBogie("AC Chair", 80),
-                new PassengerBogie("First Class", 100),
-                new PassengerBogie("Economy", 60)
-        );
+        try {
+            PassengerBogie bogie1 = new PassengerBogie("Sleeper", 50);
+            System.out.println("✅ Created: " + bogie1);
 
-        System.out.println("Original Bogie List:");
-        bogies.forEach(System.out::println);
+            PassengerBogie bogie2 = new PassengerBogie("AC Chair", 0); // invalid
+            System.out.println("✅ Created: " + bogie2);
 
-        // Stream filtering: capacity > 60
-        List<PassengerBogie> filteredBogies = bogies.stream()
-                .filter(b -> b.getCapacity() > 60)
-                .collect(Collectors.toList());
-
-        System.out.println("\nFiltered Bogies (capacity > 60):");
-        filteredBogies.forEach(System.out::println);
-
-        // Program continues...
-        System.out.println("\nProgram continues with other operations...");
+        } catch (InvalidCapacityException e) {
+            System.out.println("❌ Error: " + e.getMessage());
+        }
     }
 }

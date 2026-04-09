@@ -1,102 +1,54 @@
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
-import java.util.*;
-import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
-class TrainConsistManagementAppTest {
+public class TrainConsistManagementAppTest {
 
-    private List<PassengerBogie> createBogies() {
-        return Arrays.asList(
-                new PassengerBogie("Sleeper", 50),
-                new PassengerBogie("AC Chair", 80),
-                new PassengerBogie("First Class", 100),
-                new PassengerBogie("Economy", 60)
-        );
+    @Test
+    void testException_ValidCapacityCreation() throws InvalidCapacityException {
+        PassengerBogie bogie = new PassengerBogie("Sleeper", 50);
+        assertNotNull(bogie);
+        assertEquals(50, bogie.getCapacity());
     }
 
     @Test
-    void testFilter_CapacityGreaterThanThreshold() {
-        List<PassengerBogie> bogies = createBogies();
-        List<PassengerBogie> result = bogies.stream()
-                .filter(b -> b.getCapacity() > 70)
-                .collect(Collectors.toList());
-
-        assertEquals(2, result.size());
-        assertTrue(result.stream().allMatch(b -> b.getCapacity() > 70));
+    void testException_NegativeCapacityThrowsException() {
+        Exception exception = assertThrows(InvalidCapacityException.class, () -> {
+            new PassengerBogie("AC Chair", -10);
+        });
+        assertEquals("Capacity must be greater than zero", exception.getMessage());
     }
 
     @Test
-    void testFilter_CapacityEqualToThreshold() {
-        List<PassengerBogie> bogies = createBogies();
-        List<PassengerBogie> result = bogies.stream()
-                .filter(b -> b.getCapacity() > 60)
-                .collect(Collectors.toList());
-
-        assertFalse(result.stream().anyMatch(b -> b.getCapacity() == 60));
+    void testException_ZeroCapacityThrowsException() {
+        Exception exception = assertThrows(InvalidCapacityException.class, () -> {
+            new PassengerBogie("First Class", 0);
+        });
+        assertEquals("Capacity must be greater than zero", exception.getMessage());
     }
 
     @Test
-    void testFilter_CapacityLessThanThreshold() {
-        List<PassengerBogie> bogies = createBogies();
-        List<PassengerBogie> result = bogies.stream()
-                .filter(b -> b.getCapacity() > 60)
-                .collect(Collectors.toList());
-
-        assertTrue(result.stream().noneMatch(b -> b.getCapacity() < 60));
+    void testException_ExceptionMessageValidation() {
+        Exception exception = assertThrows(InvalidCapacityException.class, () -> {
+            new PassengerBogie("Sleeper", -5);
+        });
+        assertTrue(exception.getMessage().contains("Capacity must be greater than zero"));
     }
 
     @Test
-    void testFilter_MultipleBogiesMatching() {
-        List<PassengerBogie> bogies = createBogies();
-        List<PassengerBogie> result = bogies.stream()
-                .filter(b -> b.getCapacity() > 60)
-                .collect(Collectors.toList());
-
-        assertEquals(2, result.size());
+    void testException_ObjectIntegrityAfterCreation() throws InvalidCapacityException {
+        PassengerBogie bogie = new PassengerBogie("Sleeper", 70);
+        assertEquals("Sleeper", bogie.getType());
+        assertEquals(70, bogie.getCapacity());
     }
 
     @Test
-    void testFilter_NoBogiesMatching() {
-        List<PassengerBogie> bogies = createBogies();
-        List<PassengerBogie> result = bogies.stream()
-                .filter(b -> b.getCapacity() > 150)
-                .collect(Collectors.toList());
+    void testException_MultipleValidBogiesCreation() throws InvalidCapacityException {
+        PassengerBogie bogie1 = new PassengerBogie("Sleeper", 40);
+        PassengerBogie bogie2 = new PassengerBogie("AC Chair", 80);
+        PassengerBogie bogie3 = new PassengerBogie("First Class", 100);
 
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void testFilter_AllBogiesMatching() {
-        List<PassengerBogie> bogies = Arrays.asList(
-                new PassengerBogie("Luxury", 200),
-                new PassengerBogie("Super AC", 180)
-        );
-
-        List<PassengerBogie> result = bogies.stream()
-                .filter(b -> b.getCapacity() > 60)
-                .collect(Collectors.toList());
-
-        assertEquals(bogies.size(), result.size());
-    }
-
-    @Test
-    void testFilter_EmptyBogieList() {
-        List<PassengerBogie> bogies = Collections.emptyList();
-        List<PassengerBogie> result = bogies.stream()
-                .filter(b -> b.getCapacity() > 60)
-                .collect(Collectors.toList());
-
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void testFilter_OriginalListUnchanged() {
-        List<PassengerBogie> bogies = createBogies();
-        List<PassengerBogie> result = bogies.stream()
-                .filter(b -> b.getCapacity() > 60)
-                .collect(Collectors.toList());
-
-        assertEquals(4, bogies.size()); // original list unchanged
+        assertEquals(40, bogie1.getCapacity());
+        assertEquals(80, bogie2.getCapacity());
+        assertEquals(100, bogie3.getCapacity());
     }
 }
