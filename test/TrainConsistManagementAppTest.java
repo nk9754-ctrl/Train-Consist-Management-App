@@ -1,102 +1,54 @@
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
-import java.util.*;
-import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
+import java.util.*;
 
-class TrainConsistManagementAppTest {
+public class TrainConsistManagementAppTest {
 
-    private List<PassengerBogie> createBogies() {
+    private List<PassengerBogie> sampleBogies() {
         return Arrays.asList(
                 new PassengerBogie("Sleeper", 50),
-                new PassengerBogie("AC Chair", 80),
-                new PassengerBogie("First Class", 100),
-                new PassengerBogie("Economy", 60)
+                new PassengerBogie("AC Chair", 70),
+                new PassengerBogie("First Class", 80)
         );
     }
 
     @Test
-    void testFilter_CapacityGreaterThanThreshold() {
-        List<PassengerBogie> bogies = createBogies();
-        List<PassengerBogie> result = bogies.stream()
-                .filter(b -> b.getCapacity() > 70)
-                .collect(Collectors.toList());
-
-        assertEquals(2, result.size());
-        assertTrue(result.stream().allMatch(b -> b.getCapacity() > 70));
+    void testLoopFilteringLogic() {
+        List<PassengerBogie> result = TrainConsistManagementApp.filterByLoop(sampleBogies());
+        assertEquals(2, result.size()); // only 70 and 80 pass
     }
 
     @Test
-    void testFilter_CapacityEqualToThreshold() {
-        List<PassengerBogie> bogies = createBogies();
-        List<PassengerBogie> result = bogies.stream()
-                .filter(b -> b.getCapacity() > 60)
-                .collect(Collectors.toList());
-
-        assertFalse(result.stream().anyMatch(b -> b.getCapacity() == 60));
-    }
-
-    @Test
-    void testFilter_CapacityLessThanThreshold() {
-        List<PassengerBogie> bogies = createBogies();
-        List<PassengerBogie> result = bogies.stream()
-                .filter(b -> b.getCapacity() > 60)
-                .collect(Collectors.toList());
-
-        assertTrue(result.stream().noneMatch(b -> b.getCapacity() < 60));
-    }
-
-    @Test
-    void testFilter_MultipleBogiesMatching() {
-        List<PassengerBogie> bogies = createBogies();
-        List<PassengerBogie> result = bogies.stream()
-                .filter(b -> b.getCapacity() > 60)
-                .collect(Collectors.toList());
-
+    void testStreamFilteringLogic() {
+        List<PassengerBogie> result = TrainConsistManagementApp.filterByStream(sampleBogies());
         assertEquals(2, result.size());
     }
 
     @Test
-    void testFilter_NoBogiesMatching() {
-        List<PassengerBogie> bogies = createBogies();
-        List<PassengerBogie> result = bogies.stream()
-                .filter(b -> b.getCapacity() > 150)
-                .collect(Collectors.toList());
-
-        assertTrue(result.isEmpty());
+    void testLoopAndStreamResultsMatch() {
+        List<PassengerBogie> loopResult = TrainConsistManagementApp.filterByLoop(sampleBogies());
+        List<PassengerBogie> streamResult = TrainConsistManagementApp.filterByStream(sampleBogies());
+        assertEquals(loopResult.size(), streamResult.size());
     }
 
     @Test
-    void testFilter_AllBogiesMatching() {
-        List<PassengerBogie> bogies = Arrays.asList(
-                new PassengerBogie("Luxury", 200),
-                new PassengerBogie("Super AC", 180)
-        );
-
-        List<PassengerBogie> result = bogies.stream()
-                .filter(b -> b.getCapacity() > 60)
-                .collect(Collectors.toList());
-
-        assertEquals(bogies.size(), result.size());
+    void testExecutionTimeMeasurement() {
+        List<PassengerBogie> bogies = sampleBogies();
+        long start = System.nanoTime();
+        TrainConsistManagementApp.filterByLoop(bogies);
+        long end = System.nanoTime();
+        long elapsed = end - start;
+        assertTrue(elapsed > 0);
     }
 
     @Test
-    void testFilter_EmptyBogieList() {
-        List<PassengerBogie> bogies = Collections.emptyList();
-        List<PassengerBogie> result = bogies.stream()
-                .filter(b -> b.getCapacity() > 60)
-                .collect(Collectors.toList());
-
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void testFilter_OriginalListUnchanged() {
-        List<PassengerBogie> bogies = createBogies();
-        List<PassengerBogie> result = bogies.stream()
-                .filter(b -> b.getCapacity() > 60)
-                .collect(Collectors.toList());
-
-        assertEquals(4, bogies.size()); // original list unchanged
+    void testLargeDatasetProcessing() {
+        List<PassengerBogie> bogies = new ArrayList<>();
+        for (int i = 1; i <= 10000; i++) {
+            bogies.add(new PassengerBogie("Sleeper", i % 100));
+        }
+        List<PassengerBogie> loopResult = TrainConsistManagementApp.filterByLoop(bogies);
+        List<PassengerBogie> streamResult = TrainConsistManagementApp.filterByStream(bogies);
+        assertEquals(loopResult.size(), streamResult.size());
     }
 }

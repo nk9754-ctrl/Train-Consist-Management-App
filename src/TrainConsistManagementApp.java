@@ -1,10 +1,9 @@
 import java.util.*;
 import java.util.stream.Collectors;
 
-// Passenger Bogie class
 class PassengerBogie {
-    private String type;
-    private int capacity;
+    private String type;     // e.g., Sleeper, AC Chair, First Class
+    private int capacity;    // seat capacity
 
     public PassengerBogie(String type, int capacity) {
         this.type = type;
@@ -21,35 +20,53 @@ class PassengerBogie {
 
     @Override
     public String toString() {
-        return "PassengerBogie{" +
-                "type='" + type + '\'' +
-                ", capacity=" + capacity +
-                '}';
+        return "PassengerBogie{" + "type='" + type + '\'' + ", capacity=" + capacity + '}';
     }
 }
 
-public class TrainConsistManagementApp {
-    public static void main(String[] args) {
-        // Original bogie list (reused from UC7)
-        List<PassengerBogie> bogies = Arrays.asList(
-                new PassengerBogie("Sleeper", 50),
-                new PassengerBogie("AC Chair", 80),
-                new PassengerBogie("First Class", 100),
-                new PassengerBogie("Economy", 60)
-        );
+public class TrainConsistManagementApp{
 
-        System.out.println("Original Bogie List:");
-        bogies.forEach(System.out::println);
+    // Loop-based filtering
+    public static List<PassengerBogie> filterByLoop(List<PassengerBogie> bogies) {
+        List<PassengerBogie> result = new ArrayList<>();
+        for (PassengerBogie b : bogies) {
+            if (b.getCapacity() > 60) {
+                result.add(b);
+            }
+        }
+        return result;
+    }
 
-        // Stream filtering: capacity > 60
-        List<PassengerBogie> filteredBogies = bogies.stream()
+    // Stream-based filtering
+    public static List<PassengerBogie> filterByStream(List<PassengerBogie> bogies) {
+        return bogies.stream()
                 .filter(b -> b.getCapacity() > 60)
                 .collect(Collectors.toList());
+    }
 
-        System.out.println("\nFiltered Bogies (capacity > 60):");
-        filteredBogies.forEach(System.out::println);
+    public static void main(String[] args) {
+        // Prepare dataset
+        List<PassengerBogie> bogies = new ArrayList<>();
+        for (int i = 1; i <= 100000; i++) {
+            bogies.add(new PassengerBogie("Sleeper", i % 100)); // capacities vary 0–99
+        }
 
-        // Program continues...
-        System.out.println("\nProgram continues with other operations...");
+        // Loop-based timing
+        long startLoop = System.nanoTime();
+        List<PassengerBogie> loopResult = filterByLoop(bogies);
+        long endLoop = System.nanoTime();
+        long loopTime = endLoop - startLoop;
+
+        // Stream-based timing
+        long startStream = System.nanoTime();
+        List<PassengerBogie> streamResult = filterByStream(bogies);
+        long endStream = System.nanoTime();
+        long streamTime = endStream - startStream;
+
+        // Results
+        System.out.println("Loop result size: " + loopResult.size());
+        System.out.println("Stream result size: " + streamResult.size());
+        System.out.println("Loop execution time (ns): " + loopTime);
+        System.out.println("Stream execution time (ns): " + streamTime);
     }
 }
