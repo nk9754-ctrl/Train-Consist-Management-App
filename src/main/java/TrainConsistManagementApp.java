@@ -1,16 +1,18 @@
-﻿import java.util.Arrays;
+﻿public class TrainConsistManagementApp {
 
-public class TrainConsistManagementApp {
-
-    public static String[] sortBogieNames(String[] bogies) {
-        String[] result = bogies.clone();
-        Arrays.sort(result);
-        return result;
+    public static boolean searchBogie(String[] bogies, String key) {
+        for (String b : bogies) {
+            if (b.equals(key)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void main(String[] args) {
-        String[] bogies = {"Sleeper","AC Chair","First Class","General","Luxury"};
-        String[] sorted = sortBogieNames(bogies);
-        System.out.println(Arrays.toString(sorted));
+        String[] bogies = {"BG101","BG205","BG309","BG412","BG550"};
+
+        System.out.println(searchBogie(bogies, "BG309"));
+        System.out.println(searchBogie(bogies, "BG999"));
     }
 }
