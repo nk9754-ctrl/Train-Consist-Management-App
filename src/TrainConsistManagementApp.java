@@ -1,55 +1,54 @@
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
-// Passenger Bogie class
-class PassengerBogie {
-    private String type;
-    private int capacity;
+class GoodsBogie {
+    private String type;   // e.g., Cylindrical, Rectangular, Box
+    private String cargo;  // e.g., Petroleum, Coal, Grain
 
-    public PassengerBogie(String type, int capacity) {
+    public GoodsBogie(String type, String cargo) {
         this.type = type;
-        this.capacity = capacity;
+        this.cargo = cargo;
     }
 
     public String getType() {
         return type;
     }
 
-    public int getCapacity() {
-        return capacity;
+    public String getCargo() {
+        return cargo;
     }
 
     @Override
     public String toString() {
-        return "PassengerBogie{" +
-                "type='" + type + '\'' +
-                ", capacity=" + capacity +
-                '}';
+        return "GoodsBogie{" + "type='" + type + '\'' + ", cargo='" + cargo + '\'' + '}';
     }
 }
 
-public class TrainConsistManagementApp {
+public class TrainConsistManagementApp{
+
+    public static boolean validateSafety(List<GoodsBogie> bogies) {
+        return bogies.stream()
+                .allMatch(b -> {
+                    if (b.getType().equalsIgnoreCase("Cylindrical")) {
+                        return b.getCargo().equalsIgnoreCase("Petroleum");
+                    }
+                    return true; // Non-cylindrical bogies can carry any cargo
+                });
+    }
+
     public static void main(String[] args) {
-        // Original bogie list (reused from UC7)
-        List<PassengerBogie> bogies = Arrays.asList(
-                new PassengerBogie("Sleeper", 50),
-                new PassengerBogie("AC Chair", 80),
-                new PassengerBogie("First Class", 100),
-                new PassengerBogie("Economy", 60)
+        List<GoodsBogie> bogies = Arrays.asList(
+                new GoodsBogie("Cylindrical", "Petroleum"),
+                new GoodsBogie("Rectangular", "Coal"),
+                new GoodsBogie("Box", "Grain")
         );
 
-        System.out.println("Original Bogie List:");
-        bogies.forEach(System.out::println);
+        boolean isSafe = validateSafety(bogies);
 
-        // Stream filtering: capacity > 60
-        List<PassengerBogie> filteredBogies = bogies.stream()
-                .filter(b -> b.getCapacity() > 60)
-                .collect(Collectors.toList());
-
-        System.out.println("\nFiltered Bogies (capacity > 60):");
-        filteredBogies.forEach(System.out::println);
-
-        // Program continues...
-        System.out.println("\nProgram continues with other operations...");
+        if (isSafe) {
+            System.out.println("✅ Train formation is SAFE.");
+        } else {
+            System.out.println("❌ Train formation is UNSAFE.");
+        }
     }
 }
